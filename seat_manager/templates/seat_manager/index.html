@@ -1,0 +1,393 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="A beautiful and modern room layout manager where you can manually enter rows and columns for multiple rooms effortlessly.">
+    <title>Exam Seating Manager</title>
+    <link rel="icon" type="image/png" href="{% static 'seat_manager/favicon.png' %}">
+    <!-- We will rely on Django static for our CSS when deployed via runserver, but embedded style currently for simplicity -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'seat_manager/style_v2.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+    </div>
+
+    <main class="container">
+        <div style="position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000;">
+            <button id="theme-toggle" class="btn outline-btn" aria-label="Toggle Dark/Light Mode"
+                style="border-radius: 50%; width: 50px; height: 50px; padding: 0; background: var(--bg-card); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <i class="fa-solid fa-sun" id="theme-icon" style="font-size: 1.25rem;"></i>
+            </button>
+        </div>
+
+        <header class="hero-section fade-in">
+            <h1 class="gradient-text"><i class="fa-solid fa-layer-group"></i> Exam Seating Manager</h1>
+            <p>Design your seating arrangements with precision and style. Enter room capacities individually or apply in
+                batches.</p>
+        </header>
+
+        <!-- Configuration Step 1 -->
+        <section id="config-section" class="glass-card slide-up delay-1">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-gear"></i> Base Configuration</h2>
+                <p class="subtitle">Upload students list, and set up branch and mid-sem details.</p>
+            </div>
+
+            <form id="base-config-form" class="grid-2-col">
+                <!-- Institute specific print headers -->
+                <div class="input-wrapper floating-label" style="grid-column: span 2;">
+                    <input type="text" id="institute-name" placeholder=" " required
+                        value="IPS Academy, Institute of Engineering and Science">
+                    <label for="institute-name">Institute Name (For Print Header)</label>
+                    <i class="fa-solid fa-university input-icon"></i>
+                </div>
+                <div class="input-wrapper floating-label" style="grid-column: span 2;">
+                    <input type="file" id="institute-logo" accept="image/png, image/jpeg">
+                    <label for="institute-logo"
+                        style="top:-10px; font-size: 0.8rem; background: var(--bg-card);">Institute Logo (For Print
+                        Header, Optional)</label>
+                    <i class="fa-solid fa-image input-icon"></i>
+                </div>
+
+                <div class="input-wrapper floating-label">
+                    <input type="file" id="student-file" accept=".xlsx, .xls" required>
+                    <label for="student-file" style="top:-10px; font-size: 0.8rem; background: var(--bg-card);">Student
+                        List (Excel)</label>
+                    <i class="fa-solid fa-users input-icon"></i>
+                </div>
+                <div class="input-wrapper" style="grid-column: span 2;">
+                    <div
+                        style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.6rem 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+                        <label
+                            style="margin: 0; color: var(--text-muted); font-weight: 500; font-size: 0.85rem;">Subject
+                            Source:</label>
+                        <div style="display: flex; gap: 1.5rem; align-items: center;">
+                            <label
+                                style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.95rem; color: var(--text-main);"><input
+                                    type="radio" name="subject-source" value="excel" checked
+                                    style="width: auto; margin:0; box-shadow: none; vertical-align: middle;"> Upload
+                                Excel</label>
+                            <label
+                                style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.95rem; color: var(--text-main);"><input
+                                    type="radio" name="subject-source" value="manual"
+                                    style="width: auto; margin:0; box-shadow: none; vertical-align: middle;"> Manual
+                                Entry</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-wrapper floating-label subject-source-excel" style="grid-column: span 2;">
+                    <input type="file" id="subject-file" accept=".xlsx, .xls" required>
+                    <label for="subject-file" style="top:-10px; font-size: 0.8rem; background: var(--bg-card);">Subject
+                        Codes (Excel)</label>
+                    <i class="fa-solid fa-book input-icon"></i>
+                </div>
+
+                <div class="subject-source-manual hidden" style="grid-column: span 2;">
+                    <div class="grid-2-col" style="gap: 1rem;">
+                        <div class="input-wrapper floating-label">
+                            <input type="text" id="manual-subj-i" placeholder=" ">
+                            <label for="manual-subj-i">I Yr Subjects (comma separated)</label>
+                            <i class="fa-solid fa-pen input-icon"></i>
+                        </div>
+                        <div class="input-wrapper floating-label">
+                            <input type="text" id="manual-subj-ii" placeholder=" ">
+                            <label for="manual-subj-ii">II Yr Subjects (comma separated)</label>
+                            <i class="fa-solid fa-pen input-icon"></i>
+                        </div>
+                        <div class="input-wrapper floating-label">
+                            <input type="text" id="manual-subj-iii" placeholder=" ">
+                            <label for="manual-subj-iii">III Yr Subjects (comma separated)</label>
+                            <i class="fa-solid fa-pen input-icon"></i>
+                        </div>
+                        <div class="input-wrapper floating-label">
+                            <input type="text" id="manual-subj-iv" placeholder=" ">
+                            <label for="manual-subj-iv">IV Yr Subjects (comma separated)</label>
+                            <i class="fa-solid fa-pen input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-wrapper floating-label">
+                    <select id="department-name" required
+                        style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem 1rem 0.5rem 3rem; color: var(--text-main); font-size: 1.1rem; font-family: 'Outfit', sans-serif; appearance: none;">
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Chemical Engineering">Chemical Engineering</option>
+                        <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                        <option value="Computer Science & Information Technology" selected>Computer Science &
+                            Information Technology</option>
+                        <option value="CSE (Data Science)">CSE (Data Science)</option>
+                        <option value="CSE (AIML)">CSE (AIML)</option>
+                        <option value="CSE (IoT & CSITCS)">CSE (IoT & CSITCS)</option>
+                        <option value="Electronics & Communication Engineering">Electronics & Communication Engineering
+                        </option>
+                        <option value="Electrical and Electronics Engineering">Electrical and Electronics Engineering
+                        </option>
+                        <option value="Fire Tech & Safety Engineering">Fire Tech & Safety Engineering</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="B.Tech First Year">B.Tech First Year</option>
+                        <option value="Custom">Custom (Type Below)</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down"
+                        style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                    <label for="department-name">Department of</label>
+                    <i class="fa-solid fa-building input-icon"></i>
+                </div>
+
+                <div class="input-wrapper floating-label hidden" id="custom-department-wrapper">
+                    <input type="text" id="custom-department-name" placeholder=" " required>
+                    <label for="custom-department-name">Custom Department Name</label>
+                    <i class="fa-solid fa-pen input-icon"></i>
+                </div>
+                <div class="input-wrapper floating-label">
+                    <select id="mid-sem" required
+                        style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem 1rem 0.5rem 3rem; color: var(--text-main); font-size: 1.1rem; font-family: 'Outfit', sans-serif;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="R">Remedial</option>
+                    </select>
+                    <label for="mid-sem">MID SEM</label>
+                    <i class="fa-solid fa-graduation-cap input-icon"></i>
+                </div>
+            </form>
+        </section>
+
+        <!-- Timetable Builder Section -->
+        <section id="timetable-builder-section" class="glass-card slide-up delay-1" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-calendar-days"></i> Master Timetable Builder</h2>
+                <p class="subtitle">Assign dates, define shift timings, and select subjects for each year.</p>
+            </div>
+
+            <div id="dates-container"
+                style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <!-- Date dynamic UI goes here -->
+            </div>
+
+            <button id="add-date-btn" type="button" class="btn outline-btn" style="width: 100%;">
+                <i class="fa-solid fa-plus"></i> Add Another Date
+            </button>
+        </section>
+
+        <section id="setup-section" class="glass-card slide-up delay-2" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-door-open"></i> Layout Configuration</h2>
+                <p class="subtitle">How many rooms are you planning to manage today?</p>
+            </div>
+
+            <div class="input-stack">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-hashtag input-icon"></i>
+                    <input type="number" id="room-count" min="1" max="50" placeholder="Number of Rooms (e.g., 5)">
+                </div>
+                <button id="generate-rooms-btn" class="btn primary-btn pulse-glow">
+                    Configure Rooms <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+            </div>
+            <div id="setup-error" class="error-msg hidden">Please enter a valid number between 1 and 50.</div>
+        </section>
+
+        <!-- Room setup dynamic UI -->
+        <div id="main-content" class="hidden">
+            <section id="batch-apply-section" class="glass-card slide-up delay-2" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-object-group"></i> Batch Configuration</h2>
+                    <p class="subtitle">Quickly assign exactly the same rows and columns to multiple selected rooms.</p>
+                </div>
+
+                <div class="grid-2-col" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="input-wrapper floating-label">
+                        <input type="number" id="batch-rows" min="1" placeholder=" " required>
+                        <label for="batch-rows">Global Rows</label>
+                        <i class="fa-solid fa-arrows-up-down input-icon"></i>
+                    </div>
+                    <div class="input-wrapper floating-label">
+                        <input type="number" id="batch-cols" min="1" placeholder=" " required>
+                        <label for="batch-cols">Global Columns</label>
+                        <i class="fa-solid fa-arrows-left-right input-icon"></i>
+                    </div>
+                    <div class="input-wrapper floating-label" style="grid-column: span 2;">
+                        <select id="batch-pattern" required
+                            style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem 1rem 0.5rem 3rem; color: var(--text-main); font-size: 1.1rem; font-family: 'Outfit', sans-serif; appearance: none;">
+                            <option value="IV Yr, III Yr, II Yr, I Yr">IV Yr, III Yr, II Yr, I Yr</option>
+                            <option value="I Yr, II Yr, III Yr, IV Yr">I Yr, II Yr, III Yr, IV Yr</option>
+                            <option value="IV Yr, II Yr, III Yr, I Yr">IV Yr, II Yr, III Yr, I Yr</option>
+                            <option value="III Yr, I Yr, IV Yr, II Yr">III Yr, I Yr, IV Yr, II Yr</option>
+                            <option value="II Yr, IV Yr, I Yr, III Yr">II Yr, IV Yr, I Yr, III Yr</option>
+                            <option value="IV Yr, I Yr, III Yr, II Yr">IV Yr, I Yr, III Yr, II Yr</option>
+                            <option value="III Yr, II Yr, IV Yr, I Yr">III Yr, II Yr, IV Yr, I Yr</option>
+                            <option value="II Yr, III Yr, I Yr, IV Yr">II Yr, III Yr, I Yr, IV Yr</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down"
+                            style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                        <label for="batch-pattern">Global Seating Pattern</label>
+                        <i class="fa-solid fa-layer-group input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="batch-selection-area">
+                    <div class="selection-header">
+                        <h3>Select Target Rooms:</h3>
+                        <div class="action-links">
+                            <button id="select-all-btn" class="text-btn"><i class="fa-regular fa-square-check"></i>
+                                Select All</button>
+                            <button id="deselect-all-btn" class="text-btn"><i class="fa-regular fa-square"></i> Deselect
+                                All</button>
+                        </div>
+                    </div>
+                    <div id="batch-room-checkboxes" class="custom-checkbox-grid"></div>
+                </div>
+
+                <div class="action-footer">
+                    <button id="apply-batch-btn" class="btn accent-btn">
+                        <i class="fa-solid fa-check-double"></i> Apply to Selected
+                    </button>
+                    <div id="batch-error" class="error-msg hidden">Please check valid rows/cols and select at least one
+                        room.</div>
+                </div>
+            </section>
+
+            <section id="rooms-container" class="rooms-grid slide-up delay-3">
+                <!-- Configured Room cards go here -->
+            </section>
+
+            <section class="glass-card slide-up delay-3" style="margin-top: 2rem; text-align: center;">
+                <button id="final-generate-btn" class="btn primary-btn pulse-glow"
+                    style="display:inline-flex; width: 100%; max-width: 450px; margin: 0 auto; min-height: 3.5rem;">
+                    Generate Timetable, Seating & Attendance <i class="fa-solid fa-rocket"></i>
+                </button>
+                <div id="final-error" class="error-msg hidden"
+                    style="justify-content: center; margin-top: 1rem; color: var(--error-color); padding: 0.5rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
+                </div>
+            </section>
+        </div>
+
+        <!-- Output Display Section -->
+        <div id="output-content" class="hidden">
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;" class="slide-up delay-1">
+                <button id="back-to-config" class="btn outline-btn"><i class="fa-solid fa-arrow-left"></i> Back to
+                    Config</button>
+                <div style="flex:1"></div>
+                <button id="export-excel-btn" class="btn outline-btn" style="color: #10B981; border-color: #10B981;"><i
+                        class="fa-solid fa-file-excel"></i> Export Excel</button>
+                <button id="print-btn" class="btn primary-btn" onclick="window.print()"><i
+                        class="fa-solid fa-file-pdf"></i> Print / Save as PDF</button>
+            </div>
+
+            <div class="tabs-container slide-up delay-1"
+                style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; overflow-x: auto;">
+                <button class="tab-btn active" data-target="tab-timetable"><i class="fa-solid fa-calendar-days"></i>
+                    Master Timetable</button>
+                <button class="tab-btn" data-target="tab-seating"><i class="fa-solid fa-chair"></i> Seating
+                    Charts</button>
+                <button class="tab-btn" data-target="tab-attendance-master"><i class="fa-solid fa-clipboard-user"></i>
+                    Master Attendance</button>
+                <button class="tab-btn" data-target="tab-attendance-room"><i class="fa-solid fa-clipboard-list"></i>
+                    Room-Wise Attendance</button>
+            </div>
+
+            <div id="seating-results-container" class="slide-up delay-2">
+                <div id="tab-timetable" class="tab-content active"></div>
+                <div id="tab-seating" class="tab-content hidden"></div>
+                <div id="tab-attendance-master" class="tab-content hidden"></div>
+                <div id="tab-attendance-room" class="tab-content hidden"></div>
+            </div>
+        </div>
+        <!-- ═══════════════════════════════════════════
+             CREDITS SECTION
+        ═══════════════════════════════════════════ -->
+        <div class="credits-card fade-in" style="
+            margin-top: 3rem;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.08));
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        ">
+            <!-- Glowing accent line -->
+            <div style="
+                position: absolute;
+                top: 0; left: 0; right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #8b5cf6, #3b82f6, #06b6d4, #8b5cf6);
+                background-size: 200%;
+                animation: gradientShift 3s linear infinite;
+            "></div>
+
+            <!-- Avatar -->
+            <div style="position: relative; flex-shrink: 0;">
+                <div style="
+                    width: 72px; height: 72px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+                    padding: 3px;
+                    box-shadow: 0 0 20px rgba(139,92,246,0.5);
+                ">
+                    <img src="{% static 'seat_manager/emoji.png' %}" alt="Yash Parashar"
+                        style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;">
+                </div>
+                <div style="
+                    position: absolute; bottom: -2px; right: -2px;
+                    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+                    border-radius: 50%; width: 22px; height: 22px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 0.7rem; border: 2px solid var(--bg-dark);
+                ">✨</div>
+            </div>
+
+            <!-- Text block -->
+            <div style="text-align: left;">
+                <div
+                    style="font-size: 0.7rem; color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.2rem;">
+                    <i class="fa-solid fa-code" style="margin-right: 4px;"></i>Crafted &amp; Developed by
+                </div>
+                <div
+                    style="font-size: 1.2rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                    Asst. Prof. Yash Parashar
+                    <span style="
+                        background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+                        color: white;
+                        font-size: 0.6rem;
+                        padding: 2px 8px;
+                        border-radius: 20px;
+                        font-weight: 600;
+                        letter-spacing: 0.05em;
+                        vertical-align: middle;
+                    ">FACULTY</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.15rem;">
+                    <i class="fa-solid fa-building-columns" style="margin-right: 4px; color: var(--primary-color);"></i>
+                    Dept. of CS &amp; IT &nbsp;•&nbsp; IPS Academy
+                </div>
+            </div>
+
+            <!-- Right badge -->
+            <div style="margin-left: auto; text-align: center; opacity: 0.6;">
+                <div style="font-size: 1.8rem;">🎓</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 500;">IPS
+                    Academy</div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="{% static 'seat_manager/script_v2.js' %}"></script>
+</body>
+
+</html>

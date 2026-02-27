@@ -1,0 +1,1365 @@
+:root {
+    --bg-dark: #09090b;
+    --bg-card: rgba(24, 24, 27, 0.6);
+    --bg-card-hover: rgba(39, 39, 42, 0.8);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-highlight: rgba(168, 85, 247, 0.3);
+
+    --text-main: #f8fafc;
+    --text-muted: #a1a1aa;
+
+    --primary-color: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --accent-color: #d946ef;
+    --accent-hover: #c026d3;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+
+    --glow-primary: rgba(139, 92, 246, 0.5);
+    --glow-accent: rgba(217, 70, 239, 0.5);
+
+    --seat-empty: rgba(255, 255, 255, 0.05);
+    --seat-border: rgba(255, 255, 255, 0.1);
+    --seat-hover: var(--primary-color);
+}
+
+[data-theme="light"] {
+    --bg-dark: #e4e4e7;
+    --bg-card: rgba(255, 255, 255, 0.7);
+    --bg-card-hover: rgba(255, 255, 255, 0.95);
+    --border-color: rgba(0, 0, 0, 0.1);
+    --border-highlight: rgba(139, 92, 246, 0.6);
+
+    --text-main: #18181b;
+    --text-muted: #52525b;
+
+    --glow-primary: rgba(139, 92, 246, 0.25);
+    --glow-accent: rgba(217, 70, 239, 0.25);
+
+    --seat-empty: rgba(0, 0, 0, 0.04);
+    --seat-border: rgba(0, 0, 0, 0.15);
+}
+
+/* Light Mode Overrides */
+[data-theme="light"] .input-wrapper input,
+[data-theme="light"] select {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-main);
+}
+
+[data-theme="light"] .input-wrapper input:focus,
+[data-theme="light"] select:focus {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .batch-selection-area {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .room-stats,
+[data-theme="light"] .preview-wrapper {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .seating-table th,
+[data-theme="light"] .attendance-table th {
+    background: rgba(139, 92, 246, 0.15);
+}
+
+[data-theme="light"] .seating-table tr:hover,
+[data-theme="light"] .attendance-table tr:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .room-card:hover {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .outline-btn:hover,
+[data-theme="light"] .tab-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .preview-wrapper {
+    border: 1px inset rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Fix for disabled select options in dark theme */
+select option:disabled {
+    color: #ef4444;
+    /* bright red / error color so it's very distinct */
+    background: rgba(0, 0, 0, 0.4);
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Fix for date picker calendar icon in dark theme */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8) sepia(1) hue-rotate(180deg) saturate(200%) brightness(1.5);
+    opacity: 1;
+    cursor: pointer;
+}
+
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    line-height: 1.6;
+}
+
+/* Dynamic Background Elements */
+.background-effects {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    animation: drift 20s infinite alternate ease-in-out;
+}
+
+.glow-1 {
+    top: -10%;
+    left: -10%;
+    width: 40vw;
+    height: 40vw;
+    background: var(--glow-primary);
+}
+
+.glow-2 {
+    bottom: -20%;
+    right: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: var(--glow-accent);
+    animation-delay: -5s;
+}
+
+.glow-3 {
+    top: 40%;
+    left: 40%;
+    width: 30vw;
+    height: 30vw;
+    background: rgba(56, 189, 248, 0.3);
+    animation-delay: -10s;
+}
+
+@keyframes drift {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(5%, 5%) scale(1.1);
+    }
+
+    100% {
+        transform: translate(-5%, -5%) scale(0.9);
+    }
+}
+
+/* Layout */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+/* Typography & Headers */
+.hero-section {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.gradient-text {
+    font-size: 3.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #a855f7, #ec4899, #3b82f6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Cards (Glassmorphism) */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card:hover {
+    border-color: var(--border-highlight);
+    box-shadow: 0 25px 50px -12px rgba(168, 85, 247, 0.15);
+}
+
+.card-header {
+    margin-bottom: 2rem;
+}
+
+.card-header h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.card-header h2 i {
+    color: var(--primary-color);
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+/* Inputs & Form Elements */
+.input-stack {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.input-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+    z-index: 2;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1rem 1rem 3rem;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Explicit styling for disabled selects to ensure readability */
+.input-wrapper select:disabled,
+.floating-label select:disabled {
+    opacity: 1 !important;
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    cursor: not-allowed;
+    font-weight: 600 !important;
+    -webkit-text-fill-color: #ffffff !important;
+    /* Forces Safari/Chrome to obey color on disabled inputs */
+}
+
+/* Force high contrast for dropdown options across browsers */
+.input-wrapper select option,
+.floating-label select option {
+    background-color: var(--bg-card);
+    /* Dark background */
+    color: var(--text-main);
+    /* White text */
+    font-weight: 500;
+    padding: 10px;
+}
+
+/* File input specific padding to prevent icon overlap */
+.input-wrapper input[type="file"] {
+    padding-left: 3.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.input-wrapper input[type="file"]::file-selector-button {
+    margin-right: 1rem;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: background 0.3s;
+    vertical-align: middle;
+}
+
+.input-wrapper input[type="file"]::file-selector-button:hover {
+    background: var(--primary-hover);
+}
+
+/* Specific nudge for the icon next to file inputs to align perfectly with the standard button baseline */
+.input-wrapper input[type="file"]~.input-icon {
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top: 2px;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+}
+
+.input-wrapper input:focus~.input-icon,
+.input-wrapper select:focus~.input-icon {
+    color: var(--primary-color);
+}
+
+/* Floating Label Variant */
+.floating-label {
+    position: relative;
+}
+
+.floating-label input,
+.floating-label select {
+    padding: 1.5rem 1rem 0.5rem 3rem;
+}
+
+.floating-label label {
+    position: absolute;
+    left: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+}
+
+.floating-label input:focus~label,
+.floating-label input:not(:placeholder-shown)~label,
+.floating-label select~label {
+    top: 0.8rem;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* Buttons */
+.btn {
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+}
+
+.accent-btn {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    box-shadow: 0 4px 15px rgba(217, 70, 239, 0.3);
+}
+
+.accent-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(217, 70, 239, 0.5);
+}
+
+.outline-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.outline-btn:hover {
+    border-color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.text-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.text-btn:hover {
+    color: var(--text-main);
+}
+
+.pulse-glow {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(139, 92, 246, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    }
+}
+
+/* Grid Layouts */
+.grid-2-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Batch Section Specifics */
+.batch-selection-area {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.selection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.selection-header h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.action-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.custom-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.custom-checkbox {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.custom-checkbox:hover {
+    border-color: var(--primary-color);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.custom-checkbox input {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--text-muted);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox input:checked+.checkmark {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.custom-checkbox input:checked+.checkmark::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: white;
+}
+
+.custom-checkbox input:checked~.label-text {
+    color: white;
+    font-weight: 500;
+}
+
+.label-text {
+    color: var(--text-muted);
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.action-footer {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.error-msg {
+    color: var(--error-color);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-msg::before {
+    content: '\f071';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
+/* Rooms Grid & Cards */
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.room-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(16px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+.room-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.room-card-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.room-card-title i {
+    color: var(--accent-color);
+}
+
+.room-stats {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+}
+
+.room-config-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.room-config-row .input-wrapper {
+    min-width: 0;
+}
+
+.room-config-row .input-wrapper input {
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    font-size: 1rem;
+}
+
+.room-config-row .floating-label input {
+    padding: 1.25rem 1rem 0.5rem 2.5rem;
+}
+
+.room-config-row .floating-label label {
+    left: 2.5rem;
+    font-size: 0.95rem;
+}
+
+.room-config-row .input-icon {
+    left: 1rem;
+    font-size: 0.9rem;
+}
+
+.update-room-btn {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+/* Visual Grid Preview */
+.preview-wrapper {
+    margin-top: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px inset rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.grid-preview {
+    display: grid;
+    gap: 6px;
+    justify-content: center;
+}
+
+.seat-cell {
+    width: 24px;
+    height: 24px;
+    background: var(--seat-empty);
+    border: 1px solid var(--seat-border);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.seat-cell:hover {
+    background: var(--seat-hover);
+    transform: scale(1.15) translateY(-2px);
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4);
+}
+
+.empty-state {
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.empty-state i {
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+
+/* Results Styling - Seating and Attendance Tables */
+.seating-table,
+.attendance-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.seating-table th,
+.attendance-table th {
+    background: rgba(139, 92, 246, 0.2);
+    padding: 1rem;
+    color: var(--text-main);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.seating-table td,
+.attendance-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-muted);
+    vertical-align: middle;
+}
+
+.seating-table tr:hover,
+.attendance-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.student-id {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 1.05rem;
+}
+
+.student-yr {
+    font-size: 0.8rem;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 0.25rem;
+}
+
+.empty-seat {
+    opacity: 0.3;
+    font-style: italic;
+}
+
+
+/* Utilities & Animations */
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+.slide-up {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-1 {
+    animation-delay: 0.1s;
+}
+
+.delay-2 {
+    animation-delay: 0.3s;
+}
+
+.delay-3 {
+    animation-delay: 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Focus and Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+
+    .background-effects,
+    #config-section,
+    #setup-section,
+    #print-btn,
+    #back-to-config,
+    .pill-nav,
+    .export-btn,
+    .sub-tab-btn,
+    .theme-toggle-container {
+        display: none !important;
+    }
+
+    /* Print specific tables logic */
+    .print-container {
+        page-break-after: always;
+        page-break-inside: avoid;
+        margin-bottom: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    @page {
+        margin: 1cm;
+    }
+
+    @page :first {
+        margin-top: 1cm;
+    }
+
+    .landscape-table {
+        page: landscape;
+    }
+
+    .portrait-table {
+        page: portrait;
+    }
+
+    .glass-card {
+        border-color: #ccc;
+        box-shadow: none;
+        background: white;
+        color: black;
+    }
+
+    .gradient-text {
+        -webkit-text-fill-color: black;
+        color: black;
+    }
+
+    .seating-table th,
+    .attendance-table th {
+        background: #f1f1f1;
+        color: black;
+        border-color: #333;
+    }
+
+    .seating-table td,
+    .attendance-table td {
+        color: black;
+        border-color: #ddd;
+    }
+
+    .student-id {
+        color: black;
+    }
+
+    .student-yr {
+        background: #eee;
+        color: #333;
+        border: 1px solid #ccc;
+    }
+
+    * {
+        font-family: Arial, sans-serif !important;
+    }
+}
+
+/* Credits card gradient animation */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 2rem 1rem;
+    }
+
+    .gradient-text {
+        font-size: 2.5rem;
+    }
+
+    .glass-card {
+        padding: 1.5rem;
+    }
+
+    .rooms-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* UI Validation Highlights */
+.error-highlight {
+    border: 2px solid var(--error-color) !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4) !important;
+    background: rgba(239, 68, 68, 0.05) !important;
+}
+
+/* Tabs UI */
+.tabs-container {
+    scrollbar-width: thin;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.tab-content {
+    animation: fadeIn 0.4s ease;
+}
+
+/* Sub-nav overrides for PDF/Excel Exports */
+.exporting .hidden {
+    display: block !important;
+}
+
+.exporting .pill-nav {
+    display: none !important;
+}
+
+/* Door Indicator Styles */
+.door-indicator {
+    position: absolute;
+    background: #eab308;
+    /* High-visibility Amber */
+    color: #111827;
+    /* Dark text for contrast */
+    padding: 6px 16px;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.9rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    border: 2px solid #111827;
+    border-bottom: none;
+}
+
+.door-indicator.top-right {
+    top: -33px;
+    right: 20px;
+}
+
+.door-indicator.top-left {
+    top: -33px;
+    left: 20px;
+}
+
+.door-indicator.bottom-right {
+    bottom: -33px;
+    right: 20px;
+    border-radius: 0 0 6px 6px;
+    border: 2px solid #111827;
+    border-top: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.door-indicator.bottom-left {
+    bottom: -33px;
+    left: 20px;
+    border-radius: 0 0 6px 6px;
+    border: 2px solid #111827;
+    border-top: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================
+   PDF EXPORT STYLES (Applies to .exporting wrapper)
+   ========================================= */
+.exporting .glass-card,
+.exporting .print-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 0 30px 0 !important;
+    overflow: visible !important;
+}
+
+.exporting .pill-nav,
+.exporting .tabs-container {
+    display: none !important;
+}
+
+.exporting table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+.exporting th,
+.exporting td {
+    border: 1px solid black !important;
+    background: transparent !important;
+    color: black !important;
+}
+
+.exporting th {
+    background-color: #f3f4f6 !important;
+}
+
+.exporting h1,
+.exporting h2,
+.exporting h3,
+.exporting h4,
+.exporting p,
+.exporting div,
+.exporting span {
+    color: black !important;
+}
+
+.exporting .subject-badge,
+.exporting .year-badge {
+    background: transparent !important;
+    border: 1px solid black !important;
+    color: black !important;
+    font-weight: bold !important;
+    box-shadow: none !important;
+}
+
+.exporting .print-header {
+    border-bottom: 3px double black !important;
+}
+
+.exporting .print-container {
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+}
+
+.exporting .print-container:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+}
+
+/* =========================================
+   PRINT STYLES FOR PROFESSIONAL OUTPUT
+   ========================================= */
+@media print {
+
+    /* Base reset for printing */
+    @page {
+        margin: 0.5cm;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        color: black !important;
+    }
+
+    body::before,
+    body::after,
+    .background-effects {
+        display: none !important;
+    }
+
+    /* Hide unnecessary UI elements securely by explicit ID/Class */
+    #config-section,
+    #timetable-builder-section,
+    #setup-section,
+    #main-content,
+    header.hero-section,
+    .credits-card,
+    #theme-toggle {
+        display: none !important;
+    }
+
+    /* Inside output content, hide control buttons and navigation */
+    #output-content>div:first-child,
+    .tabs-container,
+    .pill-nav,
+    .btn {
+        display: none !important;
+    }
+
+    /* Only hide inactive main tabs. Allow all sub-panels to display for printing. */
+    .tab-content.hidden {
+        display: none !important;
+    }
+
+    /* Force all wrapper containers to block layout (No Flexbox) */
+    main.container,
+    #output-content,
+    #seating-results-container,
+    .tab-content:not(.hidden),
+    .sub-panel {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        visibility: visible !important;
+    }
+
+    /* Strip UI styling from Cards */
+    .glass-card,
+    .print-container {
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Page Breaks - container handles breaks */
+    .print-container {
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        /* Force browser to fit content to one page if possible */
+        width: 100% !important;
+    }
+
+    /* But allow Attendance tables to flow naturally across pages */
+    .print-container.portrait-table {
+        page-break-inside: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Seating tables can be small to fit the room grid */
+    .print-container .seating-table {
+        font-size: 0.70rem !important;
+    }
+
+    .print-container .seating-table th,
+    .print-container .seating-table td {
+        padding: 4px 6px !important;
+        font-size: 0.70rem !important;
+    }
+
+    .print-container .seating-table th {
+        font-size: 0.89rem !important;
+    }
+
+    .print-container .student-id {
+        font-size: 0.72rem !important;
+    }
+
+    .print-container .year-badge {
+        font-size: 0.55rem !important;
+        padding: 1px 3px !important;
+    }
+
+    .print-container .print-header h1 {
+        font-size: 1.1rem !important;
+    }
+
+    .print-container .print-header p {
+        font-size: 0.8rem !important;
+    }
+
+    .print-container h3 {
+        font-size: 0.9rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .print-container h4 {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+
+    .print-container .stats-container {
+        margin-top: 0.2rem !important;
+        padding-top: 0.2rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    .print-container .stats-container>div {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .print-container .door-indicator {
+        font-size: 0.6rem !important;
+        padding: 2px 8px !important;
+    }
+
+    .print-container .door-indicator i,
+    .fa-door-open {
+        /* Force FontAwesome icons to print */
+        font-family: "Font Awesome 6 Free" !important;
+        font-weight: 900 !important;
+    }
+
+    /* Force tables to be solid black/white for clear printing */
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid black !important;
+        background: transparent !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        page-break-inside: avoid !important;
+    }
+
+    th {
+        background-color: #f3f4f6 !important;
+    }
+
+    /* Strict Attendance Table Font Sizing (12pt like MS Word) */
+    .attendance-table th,
+    .attendance-table td {
+        font-size: 12pt !important;
+        padding: 8px !important;
+        line-height: 1.5 !important;
+    }
+
+    .attendance-table tr {
+        page-break-inside: avoid !important;
+    }
+
+    /* Text formatting */
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    div,
+    span {
+        color: black !important;
+    }
+
+    .subject-badge,
+    .year-badge {
+        background: transparent !important;
+        border: 1px solid black !important;
+        color: black !important;
+        font-weight: bold !important;
+        box-shadow: none !important;
+    }
+
+    .print-header {
+        border-bottom: 3px double black !important;
+    }
+}
