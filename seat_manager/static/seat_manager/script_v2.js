@@ -31,6 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Help Modal ---
+    const helpModal = document.getElementById('help-modal');
+    document.getElementById('help-btn')?.addEventListener('click', () => {
+        helpModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    });
+    const closeHelp = () => {
+        helpModal.style.display = 'none';
+        document.body.style.overflow = '';
+    };
+    document.getElementById('help-close-btn')?.addEventListener('click', closeHelp);
+    document.getElementById('help-got-it-btn')?.addEventListener('click', closeHelp);
+    helpModal?.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
+
     // --- Elements ---
     const roomCountInput = document.getElementById('room-count');
     const generateRoomsBtn = document.getElementById('generate-rooms-btn');
