@@ -289,9 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
             <h4 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-main);">Shift Timing</h4>
             
-            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; align-items: flex-end;">
                 <div style="flex: 1;">
-                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Start Time</label>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px;"><i class="fa-regular fa-clock" style="margin-right:3px;"></i>Start Time</label>
                     <div style="display: flex; gap: 5px;">
                         <select class="shift-start-hr" required style="flex:1; padding: 0.5rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);">
                             <option value="" disabled selected>HH</option>
@@ -307,8 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         </select>
                     </div>
                 </div>
+                <div style="color: var(--text-muted); font-size: 1.2rem; padding-bottom: 0.4rem; flex-shrink: 0;">→</div>
                 <div style="flex: 1;">
-                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px;">End Time</label>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px;"><i class="fa-regular fa-clock" style="margin-right:3px;"></i>End Time</label>
                     <div style="display: flex; gap: 5px;">
                         <select class="shift-end-hr" required style="flex:1; padding: 0.5rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);">
                             <option value="" disabled selected>HH</option>
@@ -326,8 +327,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             
-            <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Participating Years</h4>
-            <div class="years-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);"><i class="fa-solid fa-users" style="margin-right:5px;"></i>Participating Years</h4>
+            <div class="years-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                 <!-- Dynamically added year rows here... -->
             </div>
         `;
@@ -339,15 +340,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const yrId = `${shiftId}-yr-${idx}`;
             const yrRow = document.createElement('div');
             yrRow.style.display = 'flex';
-            yrRow.style.alignItems = 'center';
-            yrRow.style.gap = '1rem';
+            yrRow.style.flexDirection = 'column';
+            yrRow.style.gap = '0.4rem';
+            yrRow.style.background = 'rgba(0,0,0,0.15)';
+            yrRow.style.border = '1px solid var(--border-color)';
+            yrRow.style.borderRadius = '8px';
+            yrRow.style.padding = '0.5rem 0.75rem';
 
             yrRow.innerHTML = `
-                <label style="display: flex; align-items: center; gap: 0.5rem; width: 100px; cursor: pointer;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--text-main);">
                     <input type="checkbox" class="year-checkbox custom-checkbox" data-year="${yr}"> ${yr}
                 </label>
-                <div class="input-wrapper subject-wrapper hidden" style="flex:1; margin-bottom: 0;">
-                    <select class="subject-select" data-year="${yr}" style="width: 100%; padding: 0.5rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);">
+                <div class="input-wrapper subject-wrapper hidden" style="margin-bottom: 0;">
+                    <select class="subject-select" data-year="${yr}" style="width: 100%; padding: 0.4rem 0.5rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-size: 0.85rem;">
                         <option value="" disabled selected>Select Subject</option>
                     </select>
                 </div>
