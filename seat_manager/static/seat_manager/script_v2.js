@@ -441,13 +441,15 @@ document.addEventListener('DOMContentLoaded', () => {
         div.style.position = 'relative';
 
         div.innerHTML = `
-            <button type="button" class="btn text-btn remove-date-btn" style="position: absolute; top:1rem; right:1rem; color: var(--error-color);">
-                <i class="fa-solid fa-trash"></i> Remove Date
-            </button>
-            <h3 style="margin-bottom: 1.5rem; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                 <i class="fa-regular fa-calendar" style="margin-right: 8px;"></i> Exam Date Configuration
-            </h3>
-            
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; flex-wrap: wrap;">
+                <h3 style="margin: 0; color: var(--primary-color); font-size: 1.1rem;">
+                    <i class="fa-regular fa-calendar" style="margin-right: 8px;"></i>Exam Date Configuration
+                </h3>
+                <button type="button" class="btn text-btn remove-date-btn" style="color: var(--error-color); padding: 4px 8px; flex-shrink: 0;">
+                    <i class="fa-solid fa-trash"></i> Remove Date
+                </button>
+            </div>
+
             <div class="input-wrapper floating-label" style="max-width: 300px; margin-bottom: 1.5rem;">
                 <input type="date" class="date-input" required>
                 <label style="top: -10px; background: var(--bg-card); font-size: 0.8rem">Select Date</label>
