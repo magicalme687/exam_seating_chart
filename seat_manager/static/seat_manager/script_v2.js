@@ -1264,10 +1264,8 @@ document.addEventListener('DOMContentLoaded', () => {
             consolidatedSeating[hashKey].sessions.push({ date: plan.date, shift: plan.shift });
         });
 
-        // Get unique sorted list of rooms across all seating plans
-        const seatingRoomsList = [...new Set(Object.values(consolidatedSeating).map(c => c.room_name))].sort((a, b) => {
-            return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-        });
+        // Preserve the exact room order the user entered (UI tile order) — no sorting
+        const seatingRoomsList = [...new Set(data.seating_plans.map(p => p.room_name))];
 
         if (seatingRoomsList.length > 0) {
             // Create pill nav for Rooms (flat tab structure exactly like Attendance)
@@ -1443,11 +1441,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            // Get unique sorted list of rooms
-            const roomsList = [...new Set(Object.values(consolidatedAttendance).map(c => c.room_name))].sort((a, b) => {
-                // Try natural sort for Room 1 vs Room 10
-                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-            });
+            // Preserve the exact room order the user entered (UI tile order) — no sorting
+            const roomsList = [...new Set(data.room_attendance_data.map(r => r.room_name))];
 
             // Create pill nav for Rooms (flat tab structure)
             roomAttendanceHtml += `<div class="pill-nav" style="display:flex; justify-content:center; gap:10px; margin-bottom:2rem; flex-wrap:wrap;">`;
