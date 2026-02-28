@@ -169,6 +169,28 @@
                 <p class="subtitle">Assign dates, define shift timings, and select subjects for each year.</p>
             </div>
 
+            <!-- Global Exam Duration -->
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 10px; flex-wrap: wrap;">
+                <i class="fa-solid fa-clock" style="color: var(--primary-color); font-size: 1.1rem;"></i>
+                <label style="font-size: 0.9rem; font-weight: 600; color: var(--text-main); white-space: nowrap;">Exam Duration</label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <select id="exam-dur-hr" style="padding: 0.4rem 0.6rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-family: inherit; font-size: 0.95rem;">
+                        <option value="0">0 hr</option>
+                        <option value="1" selected>1 hr</option>
+                        <option value="2">2 hr</option>
+                        <option value="3">3 hr</option>
+                        <option value="4">4 hr</option>
+                    </select>
+                    <select id="exam-dur-min" style="padding: 0.4rem 0.6rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-family: inherit; font-size: 0.95rem;">
+                        <option value="0" selected>00 min</option>
+                        <option value="15">15 min</option>
+                        <option value="30">30 min</option>
+                        <option value="45">45 min</option>
+                    </select>
+                </div>
+                <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-circle-info" style="margin-right:3px;"></i>End time auto-fills when you set Start Time</span>
+            </div>
+
             <div id="dates-container"
                 style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem;">
                 <!-- Date dynamic UI goes here -->

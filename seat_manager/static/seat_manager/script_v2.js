@@ -365,28 +365,45 @@ document.addEventListener('DOMContentLoaded', () => {
             updateSubjectOptions();
         });
 
-        const setupTimeFormat = (input) => {
-            input.addEventListener('focus', function () {
-                this.type = 'time';
-                if (this.dataset.val) this.value = this.dataset.val;
-            });
-            input.addEventListener('blur', function () {
-                if (this.type === 'time') {
-                    this.dataset.val = this.value;
-                    this.type = 'text';
-                    if (this.dataset.val) {
-                        let [h, m] = this.dataset.val.split(':');
-                        if (h && m) {
-                            let hours = parseInt(h);
-                            const ampm = hours >= 12 ? 'PM' : 'AM';
-                            hours = hours % 12 || 12;
-                            this.value = `${hours}:${m} ${ampm}`;
-                        }
-                    }
-                }
-            });
+        // --- Auto-fill End Time from Start Time + Global Exam Duration ---
+        const autoFillEndTime = () => {
+            const durHr = parseInt(document.getElementById('exam-dur-hr')?.value || '0', 10);
+            const durMin = parseInt(document.getElementById('exam-dur-min')?.value || '0', 10);
+            const totalDurMins = durHr * 60 + durMin;
+            if (totalDurMins === 0) return; // No duration set, skip
+
+            const sHr = shiftDiv.querySelector('.shift-start-hr').value;
+            const sMin = shiftDiv.querySelector('.shift-start-min').value;
+            const sAmPm = shiftDiv.querySelector('.shift-start-ampm').value;
+            if (!sHr || !sMin || !sAmPm) return; // Start time incomplete
+
+            // Convert start to 24h minutes
+            let startH24 = parseInt(sHr, 10) % 12; // 12 AM/PM → 0
+            if (sAmPm === 'PM') startH24 += 12;
+            const startTotalMins = startH24 * 60 + parseInt(sMin, 10);
+
+            // Add duration
+            const endTotalMins = startTotalMins + totalDurMins;
+            const endH24 = Math.floor(endTotalMins / 60) % 24;
+            const endMin = endTotalMins % 60;
+
+            // Convert back to 12h
+            const endAmPm = endH24 >= 12 ? 'PM' : 'AM';
+            const endH12 = endH24 % 12 || 12;
+
+            const endHrStr = String(endH12).padStart(2, '0');
+            const endMinStr = String(endMin).padStart(2, '0');
+
+            // Set end-time dropdowns
+            shiftDiv.querySelector('.shift-end-hr').value = endHrStr;
+            shiftDiv.querySelector('.shift-end-min').value = endMinStr;
+            shiftDiv.querySelector('.shift-end-ampm').value = endAmPm;
         };
-        // Formatting for time wrappers is no longer needed cleanly skipped.
+
+        // Trigger auto-fill whenever any start-time dropdown changes
+        shiftDiv.querySelector('.shift-start-hr').addEventListener('change', autoFillEndTime);
+        shiftDiv.querySelector('.shift-start-min').addEventListener('change', autoFillEndTime);
+        shiftDiv.querySelector('.shift-start-ampm').addEventListener('change', autoFillEndTime);
 
         shiftsContainer.appendChild(shiftDiv);
     }
@@ -475,7 +492,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Match: optional leading letters, then digits at the end
         const match = name.match(/^([A-Za-z]*)([0-9]+)([^0-9]*)$/);
         if (match) {
-            return { prefix: match[1], number: parseInt(match[2], 10), suffix: match[3], parsed: true };
+            return {
+                prefix: match[1],
+                number: parseInt(match[2], 10),
+                numWidth: match[2].length, // preserve original digit width (e.g. "003" → width 3)
+                suffix: match[3],
+                parsed: true
+            };
         }
         return { parsed: false };
     }
@@ -492,11 +515,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const startIdx = roomData.findIndex(r => r.id === changedId);
         if (startIdx === -1) return;
 
-        // Update all subsequent rooms
+        // Update all subsequent rooms, preserving leading-zero width
+        const numWidth = parsed.numWidth || 1;
         let nextNum = parsed.number + 1;
         for (let i = startIdx + 1; i < roomData.length; i++) {
             const room = roomData[i];
-            const newName = `${parsed.prefix}${nextNum}${parsed.suffix}`;
+            const paddedNum = String(nextNum).padStart(numWidth, '0');
+            const newName = `${parsed.prefix}${paddedNum}${parsed.suffix}`;
 
             // Update the input
             const input = document.getElementById(`room-name-input-${room.id}`);
@@ -1263,16 +1288,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Smart Orientation Logic
                     const orientationClass = plan.cols > plan.rows ? 'landscape-table' : 'portrait-table';
 
-                    // Construct a beautifully formatted string of all dates/shifts sharing this layout
-                    const sessionsHtml = plan.sessions.map(s => `${s.date} | ${s.shift}`).join('<br>');
+                    // Construct a compact single-line string of all dates/shifts sharing this layout
+                    const sessionsHtml = plan.sessions.map(s => `<span style="white-space:nowrap;">${s.date} &nbsp;${s.shift}</span>`).join('<span style="margin:0 6px;opacity:0.5;">•</span>');
 
                     seatingHtml += `
             <div class="glass-card ${orientationClass} print-container" style="margin-bottom: 4rem; overflow-x: auto; position: relative;">
                                 ${buildPrintHeader(`Seating Chart • ${plan.room_name}`)}
-                                <div style="color: var(--text-main); margin-bottom: 1.5rem; text-align: center; font-size: 1.2rem; font-weight: 600; line-height: 1.5; border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; display: inline-block; min-width: 300px;">
-                                    ${sessionsHtml}
+                                <div style="color: var(--text-main); margin-bottom: 0.75rem; text-align: center; font-size: 0.85rem; font-weight: 600; line-height: 1.4; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px;">
+                                    <i class="fa-regular fa-calendar" style="margin-right:4px; opacity:0.7;"></i>${sessionsHtml}
                                 </div>
-                                <h3 style="color: var(--text-main); margin-bottom: 2rem; text-align: center; font-size: 1.5rem;">ROOM: ${plan.room_name}</h3>
                                 
                                 <div style="position: relative; display: inline-block; width: 100%; margin-top: 1.5rem;">
                                     <div class="door-indicator ${plan.door}"><i class="fa-solid fa-door-open"></i> Entry</div>
