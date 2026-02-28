@@ -97,9 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Clear previous
                     window.subjectCodes = { "I Yr": [], "II Yr": [], "III Yr": [], "IV Yr": [] };
 
-                    // Parse columns (assuming no headers, or skipping row 0 if it's headers. Let's assume row 0 might be headers like '1st Year')
-                    // Start from row 0, if it looks like a subject code, keep it.
-                    json.forEach(row => {
+                    // Skip row 0 — it's the header row (e.g. "I Yr", "II Yr", etc.)
+                    json.slice(1).forEach(row => {
                         // Combines Subject Code and Name into a single string if available
                         if (row[0]) {
                             let txt = String(row[0]).trim();
@@ -238,23 +237,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateDropdown(selectEl, year) {
         const val = selectEl.value;
-        selectEl.innerHTML = '<option value="" disabled selected>Select Subject</option>';
-        if (window.subjectCodes[year]) {
+        // Clear and rebuild — no disabled placeholder option
+        selectEl.innerHTML = '';
+        if (window.subjectCodes[year] && window.subjectCodes[year].length > 0) {
             window.subjectCodes[year].forEach(code => {
                 const opt = document.createElement('option');
                 opt.value = code;
                 opt.textContent = code;
                 selectEl.appendChild(opt);
             });
+        } else {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '— No subjects loaded —';
+            opt.disabled = true;
+            opt.selected = true;
+            selectEl.appendChild(opt);
         }
-        if (val) selectEl.value = val;
+
+        if (val) {
+            // Restore previous selection
+            selectEl.value = val;
+        } else {
+            // Auto-select the first subject not already used in any other active dropdown
+            const usedValues = new Set();
+            document.querySelectorAll('.subject-select').forEach(other => {
+                if (other !== selectEl) {
+                    const w = other.closest('.input-wrapper');
+                    if (w && !w.classList.contains('hidden') && other.value) {
+                        usedValues.add(other.value);
+                    }
+                }
+            });
+            const firstAvailable = Array.from(selectEl.options).find(o => o.value && !usedValues.has(o.value));
+            if (firstAvailable) {
+                selectEl.value = firstAvailable.value;
+            } else {
+                // All subjects exhausted — insert disabled placeholder so browser doesn't auto-pick first
+                const ph = document.createElement('option');
+                ph.value = '';
+                ph.textContent = '\u2014 All subjects scheduled \u2014';
+                ph.disabled = true;
+                ph.selected = true;
+                selectEl.insertBefore(ph, selectEl.firstChild);
+                selectEl.value = '';
+            }
+        }
     }
 
-    // Update global subject options to disable selected subjects in other dropdowns
+    // Once a subject is selected anywhere, disable it everywhere else
+    // (an exam that happened in one shift can't be scheduled again in another)
     function updateSubjectOptions() {
         const allSelects = document.querySelectorAll('.subject-select');
         const selectedValues = new Set();
 
+        // Collect all currently selected subjects across all shifts/dates
         allSelects.forEach(select => {
             const wrapper = select.closest('.input-wrapper');
             if (wrapper && !wrapper.classList.contains('hidden') && select.value) {
@@ -262,13 +299,38 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Disable those subjects in every other dropdown
         allSelects.forEach(select => {
-            const options = select.querySelectorAll('option');
-            options.forEach(opt => {
+            select.querySelectorAll('option').forEach(opt => {
                 if (opt.value && opt.value !== select.value) {
                     opt.disabled = selectedValues.has(opt.value);
                 }
             });
+        });
+
+        // Disable year checkboxes whose entire subject list is exhausted
+        // (only disable unchecked checkboxes — already-selected ones stay active)
+        document.querySelectorAll('.year-checkbox').forEach(cb => {
+            if (cb.checked) return; // don't touch already-selected years
+            const yr = cb.dataset.year;
+            const subjectsForYear = window.subjectCodes?.[yr] || [];
+            if (subjectsForYear.length === 0) return; // no subjects loaded yet
+
+            const allUsed = subjectsForYear.every(code => selectedValues.has(code));
+            const yrRow = cb.closest('.yr-card'); // reliably targets the year card
+            if (allUsed) {
+                cb.disabled = true;
+                if (yrRow) {
+                    yrRow.style.opacity = '0.45';
+                    yrRow.title = `All ${yr} subjects already scheduled`;
+                }
+            } else {
+                cb.disabled = false;
+                if (yrRow) {
+                    yrRow.style.opacity = '';
+                    yrRow.title = '';
+                }
+            }
         });
     }
 
@@ -339,6 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         years.forEach((yr, idx) => {
             const yrId = `${shiftId}-yr-${idx}`;
             const yrRow = document.createElement('div');
+            yrRow.className = 'yr-card';
             yrRow.style.display = 'flex';
             yrRow.style.flexDirection = 'column';
             yrRow.style.gap = '0.4rem';
@@ -352,8 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="checkbox" class="year-checkbox" data-year="${yr}" style="accent-color: var(--primary-color); width: 15px; height: 15px; cursor: pointer; flex-shrink:0;"> ${yr}
                 </label>
                 <div class="input-wrapper subject-wrapper hidden" style="margin-bottom: 0;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 3px;">Select Subject</span>
                     <select class="subject-select" data-year="${yr}" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 7px; background: rgba(0,0,0,0.3); border: 1px solid rgba(139,92,246,0.4); color: var(--text-main); font-size: 0.85rem; outline: none;">
-                        <option value="" disabled selected>Select Subject</option>
                     </select>
                 </div>
             `;
@@ -437,6 +500,8 @@ document.addEventListener('DOMContentLoaded', () => {
         shiftDiv.querySelector('.shift-start-ampm').addEventListener('change', autoFillEndTime);
 
         shiftsContainer.appendChild(shiftDiv);
+        // Run AFTER DOM insertion so new shift's checkboxes are visible to querySelectorAll
+        updateSubjectOptions();
     }
 
     function createDateBlock() {
