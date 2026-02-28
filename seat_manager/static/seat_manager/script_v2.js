@@ -148,8 +148,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const manualSourceDiv = document.querySelector('.subject-source-manual');
     const subjectFile = document.getElementById('subject-file');
 
+    // Update pill toggle visual state
+    const pillExcel = document.getElementById('pill-excel');
+    const pillManual = document.getElementById('pill-manual');
+    const ACTIVE_PILL_STYLE = 'background:linear-gradient(135deg,var(--primary-color),var(--primary-hover));color:white;box-shadow:0 2px 8px rgba(139,92,246,0.35);';
+    const INACTIVE_PILL_STYLE = 'background:transparent;color:var(--text-muted);box-shadow:none;';
+
+    function updatePillStyles() {
+        const val = document.querySelector('input[name="subject-source"]:checked')?.value;
+        if (pillExcel && pillManual) {
+            pillExcel.style.cssText += val === 'excel' ? ACTIVE_PILL_STYLE : INACTIVE_PILL_STYLE;
+            pillManual.style.cssText += val === 'manual' ? ACTIVE_PILL_STYLE : INACTIVE_PILL_STYLE;
+        }
+    }
+    updatePillStyles(); // Set correct state on load
+
     subjectSourceRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
+            updatePillStyles();
             if (e.target.value === 'excel') {
                 excelSourceDiv.classList.remove('hidden');
                 manualSourceDiv.classList.add('hidden');

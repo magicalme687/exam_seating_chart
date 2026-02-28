@@ -67,22 +67,27 @@
                     <i class="fa-solid fa-users input-icon"></i>
                 </div>
                 <div class="input-wrapper" style="grid-column: span 2;">
-                    <div
-                        style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.6rem 1.2rem; display: flex; align-items: center; justify-content: space-between;">
-                        <label
-                            style="margin: 0; color: var(--text-muted); font-weight: 500; font-size: 0.85rem;">Subject
-                            Source:</label>
-                        <div style="display: flex; gap: 1.5rem; align-items: center;">
-                            <label
-                                style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.95rem; color: var(--text-main);"><input
-                                    type="radio" name="subject-source" value="excel" checked
-                                    style="width: auto; margin:0; box-shadow: none; vertical-align: middle;"> Upload
-                                Excel</label>
-                            <label
-                                style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.95rem; color: var(--text-main);"><input
-                                    type="radio" name="subject-source" value="manual"
-                                    style="width: auto; margin:0; box-shadow: none; vertical-align: middle;"> Manual
-                                Entry</label>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <span
+                            style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; white-space: nowrap;">
+                            <i class="fa-solid fa-table-list"
+                                style="margin-right: 5px; color: var(--primary-color);"></i>Subject Source
+                        </span>
+                        <!-- Hidden real radio inputs (logic stays the same) -->
+                        <input type="radio" name="subject-source" id="src-excel" value="excel" checked
+                            style="display:none;">
+                        <input type="radio" name="subject-source" id="src-manual" value="manual" style="display:none;">
+                        <!-- Pill toggle -->
+                        <div
+                            style="display: inline-flex; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); border-radius: 10px; padding: 4px; gap: 4px;">
+                            <label for="src-excel" id="pill-excel"
+                                style="cursor: pointer; padding: 0.45rem 1.1rem; border-radius: 7px; font-size: 0.9rem; font-weight: 600; transition: all 0.2s ease; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); color: white; box-shadow: 0 2px 8px rgba(139,92,246,0.35);">
+                                <i class="fa-solid fa-file-excel" style="margin-right: 5px;"></i>Upload Excel
+                            </label>
+                            <label for="src-manual" id="pill-manual"
+                                style="cursor: pointer; padding: 0.45rem 1.1rem; border-radius: 7px; font-size: 0.9rem; font-weight: 600; transition: all 0.2s ease; color: var(--text-muted);">
+                                <i class="fa-solid fa-keyboard" style="margin-right: 5px;"></i>Manual Entry
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -170,25 +175,30 @@
             </div>
 
             <!-- Global Exam Duration -->
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 10px; flex-wrap: wrap;">
+            <div
+                style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 10px; flex-wrap: wrap;">
                 <i class="fa-solid fa-clock" style="color: var(--primary-color); font-size: 1.1rem;"></i>
-                <label style="font-size: 0.9rem; font-weight: 600; color: var(--text-main); white-space: nowrap;">Exam Duration</label>
+                <label style="font-size: 0.9rem; font-weight: 600; color: var(--text-main); white-space: nowrap;">Exam
+                    Duration</label>
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <select id="exam-dur-hr" style="padding: 0.4rem 0.6rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-family: inherit; font-size: 0.95rem;">
+                    <select id="exam-dur-hr"
+                        style="padding: 0.4rem 0.6rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-family: inherit; font-size: 0.95rem;">
                         <option value="0">0 hr</option>
                         <option value="1" selected>1 hr</option>
                         <option value="2">2 hr</option>
                         <option value="3">3 hr</option>
                         <option value="4">4 hr</option>
                     </select>
-                    <select id="exam-dur-min" style="padding: 0.4rem 0.6rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-family: inherit; font-size: 0.95rem;">
+                    <select id="exam-dur-min"
+                        style="padding: 0.4rem 0.6rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-family: inherit; font-size: 0.95rem;">
                         <option value="0" selected>00 min</option>
                         <option value="15">15 min</option>
                         <option value="30">30 min</option>
                         <option value="45">45 min</option>
                     </select>
                 </div>
-                <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-circle-info" style="margin-right:3px;"></i>End time auto-fills when you set Start Time</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-circle-info"
+                        style="margin-right:3px;"></i>End time auto-fills when you set Start Time</span>
             </div>
 
             <div id="dates-container"
