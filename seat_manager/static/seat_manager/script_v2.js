@@ -348,11 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
             yrRow.style.padding = '0.5rem 0.75rem';
 
             yrRow.innerHTML = `
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--text-main);">
-                    <input type="checkbox" class="year-checkbox custom-checkbox" data-year="${yr}"> ${yr}
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); transition: color 0.2s;" class="yr-label">
+                    <input type="checkbox" class="year-checkbox" data-year="${yr}" style="accent-color: var(--primary-color); width: 15px; height: 15px; cursor: pointer; flex-shrink:0;"> ${yr}
                 </label>
                 <div class="input-wrapper subject-wrapper hidden" style="margin-bottom: 0;">
-                    <select class="subject-select" data-year="${yr}" style="width: 100%; padding: 0.4rem 0.5rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-size: 0.85rem;">
+                    <select class="subject-select" data-year="${yr}" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 7px; background: rgba(0,0,0,0.3); border: 1px solid rgba(139,92,246,0.4); color: var(--text-main); font-size: 0.85rem; outline: none;">
                         <option value="" disabled selected>Select Subject</option>
                     </select>
                 </div>
@@ -370,10 +370,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.target.checked) {
                     subWrapper.classList.remove('hidden');
                     subSelect.required = true;
+                    // Activate card style
+                    yrRow.style.background = 'rgba(139,92,246,0.12)';
+                    yrRow.style.borderColor = 'var(--primary-color)';
+                    yrRow.style.boxShadow = '0 0 0 1px rgba(139,92,246,0.3)';
+                    yrRow.querySelector('.yr-label').style.color = 'var(--text-main)';
                 } else {
                     subWrapper.classList.add('hidden');
                     subSelect.required = false;
                     subSelect.value = "";
+                    // Reset card style
+                    yrRow.style.background = 'rgba(0,0,0,0.15)';
+                    yrRow.style.borderColor = 'var(--border-color)';
+                    yrRow.style.boxShadow = 'none';
+                    yrRow.querySelector('.yr-label').style.color = 'var(--text-muted)';
                 }
                 updateSubjectOptions();
             });
