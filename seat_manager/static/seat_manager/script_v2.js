@@ -1241,9 +1241,28 @@ document.addEventListener('DOMContentLoaded', () => {
         let filenameStr = 'Exam_Result.xlsx';
         if (activeTab.id === 'tab-timetable') filenameStr = 'Master_Timetable.xlsx';
         if (activeTab.id === 'tab-seating') filenameStr = 'Seating_Charts.xlsx';
+        if (activeTab.id === 'tab-attendance-room') filenameStr = 'Room_Wise_Attendance.xlsx';
+        if (activeTab.id === 'tab-attendance') filenameStr = 'Attendance_Sheets.xlsx';
 
         XLSX.writeFile(wb, filenameStr);
         activeTab.classList.remove('exporting');
+    });
+
+    // --- Print Button: set descriptive document.title so PDF filename is meaningful ---
+    document.getElementById('print-btn').addEventListener('click', () => {
+        const activeTab = document.querySelector('.tab-content:not(.hidden)');
+        const tabTitleMap = {
+            'tab-timetable': 'Master_Timetable',
+            'tab-seating': 'Seating_Charts',
+            'tab-attendance-master': 'Master_Attendance',
+            'tab-attendance-room': 'Room_Wise_Attendance',
+            'tab-attendance': 'Attendance_Sheets',
+        };
+        const originalTitle = document.title;
+        document.title = activeTab ? (tabTitleMap[activeTab.id] || 'Exam_Report') : 'Exam_Report';
+        window.print();
+        // Restore after print dialog closes
+        setTimeout(() => { document.title = originalTitle; }, 1000);
     });
 
     // Global UI toggle functions for the nested tabs
